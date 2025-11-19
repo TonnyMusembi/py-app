@@ -9,3 +9,12 @@ venv/
 .vscode/
 logs/
 .venv/
+.pyc
+*.pyo
+*.pyd
+__pycache__/
+.venv/
+env/
+env.bak/
+venv.bak/
+
