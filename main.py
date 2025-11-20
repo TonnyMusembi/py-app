@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 import pandas as pd
 from io import StringIO
@@ -20,6 +21,22 @@ logger.info("This is a custom formatted log")
 logger.info("Starting FastAPI application")
 
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://myfrontend.com"],
+    allow_credentials=True,
+    allow_methods=["POST", "GET", "OPTIONS"],
+    allow_headers=["*"]
+)
+
+
+@app.get("/api/data")
+def read_data():
+    logger.info("CORS test endpoint called")
+    return {"message": "CORS works!"}
+    logger .info("CORS test endpoint called")
 
 @app.get("/items/{item_id}")
 async def read_item(item_id):
