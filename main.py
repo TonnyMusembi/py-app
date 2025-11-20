@@ -1,9 +1,11 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI
+
 import pandas as pd
 from io import StringIO
 from database import get_connection
 import logging
-
+from users import upload_users
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,6 +21,10 @@ logger.info("Starting FastAPI application")
 
 app = FastAPI()
 
+@app.get("/items/{item_id}")
+async def read_item(item_id):
+    return {"item_id": item_id}
+logger.info("Read item endpoint called")
 @app.post("/upload-csv")
 async def upload_csv(file: UploadFile = File(...)):
     # Validate file type
@@ -52,5 +58,4 @@ else:
 async def root():
     return {"message": "Welcome to the CSV upload API. Use the /upload-csv endpoint to upload a CSV file."}
 app.get("/")(root)
-
 
