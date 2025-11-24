@@ -7,6 +7,8 @@ from io import StringIO
 from database import get_connection
 import logging
 from users import upload_users
+#
+# from users import get_users
 
 logging.basicConfig(
     level=logging.INFO,
@@ -75,4 +77,6 @@ else:
 async def root():
     return {"message": "Welcome to the CSV upload API. Use the /upload-csv endpoint to upload a CSV file."}
 app.get("/")(root)
+
+
 
