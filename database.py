@@ -4,7 +4,7 @@ import mysql.connector
 from mysql.connector import Error
 
 load_dotenv()
-
+# load env
 def get_connection():
     try:
         connection = mysql.connector.connect(

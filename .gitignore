@@ -17,4 +17,6 @@ __pycache__/
 env/
 env.bak/
 venv.bak/
-
+.mypy_cache/
+.env
+*.sqlite3
