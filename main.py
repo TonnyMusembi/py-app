@@ -7,6 +7,10 @@ from io import StringIO
 from database import get_connection
 import logging
 from users import upload_users
+import csv
+import io
+from datetime import datetime
+from loguru import logger
 #
 # from users import get_users
 
@@ -80,3 +84,52 @@ app.get("/")(root)
 
 
 
+@app.post("/users/upload-csv")
+async def upload_users_csv(file: UploadFile = File(...)):
+    if not file.filename.endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Only CSV files are allowed")
+
+    contents = await file.read()
+    csv_stream = io.StringIO(contents.decode("utf-8"))
+    reader = csv.DictReader(csv_stream)
+
+    required_cols = {"phone_number", "full_names"}
+    if not required_cols.issubset(reader.fieldnames):
+        raise HTTPException(
+            status_code=400,
+            detail=f"CSV must contain {required_cols}"
+        )
+
+    users = []
+    skipped = 0
+
+    for row in reader:
+        try:
+            dob = None
+            if row.get("date_of_birth"):
+                dob = datetime.strptime(row["date_of_birth"], "%Y-%m-%d").date()
+
+            users.append({
+                "phone_number": row["phone_number"].strip(),
+                "full_names": row["full_names"].strip(),
+                "email": row.get("email"),
+                "national_id_number": row.get("national_id_number"),
+                "date_of_birth": dob,
+            })
+        except Exception as e:
+            logger.warning(f"Skipping row {row}: {e}")
+            skipped += 1
+
+    if not users:
+        raise HTTPException(status_code=400, detail="No valid rows found")
+
+    # result = await bulk_upsert_users(users)
+    result = {"inserted": 0, "updated": 0}
+
+
+    return {
+        "uploaded": len(users),
+        "inserted": result["inserted"],
+        "updated": result["updated"],
+        "skipped": skipped
+    }
